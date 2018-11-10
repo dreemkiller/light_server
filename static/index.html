@@ -35,6 +35,33 @@
             request.setRequestHeader("Content-type", "application/json");
             request.send(json)
         }
+        function checkServerChange() {
+            // make Ajax call here, inside the callback call:
+            request = new XMLHttpRequest();
+            request.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    obj = JSON.parse(this.responseText);
+                    if (document.querySelector('input[name="program"]:checked').value !=  obj.number) {
+                        console.log("Changed");
+                        //var span = document.getElementById("span_id");
+                        var inputs = document.getElementsByName("program");
+                        for (var i = 0; i < inputs.length; ++i) {
+                            console.log("input.id = " + inputs[i].id)
+                            if (inputs[i].value == obj.number) {
+                                inputs[i].checked = true;
+                            } else {
+                                inputs[i].checked = false;
+                            };
+                        }
+                    }
+                    console.log(this.responseText);
+                }
+            };
+            request.open("GET", "/CurrentProgram", true);
+            request.send();
+        }
+
+        setInterval(checkServerChange, 10000);
     </script>
     </body>
 </html>
