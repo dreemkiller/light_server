@@ -35,8 +35,8 @@ func main() {
     router := mux.NewRouter()
     router.HandleFunc("/CurrentProgram", GetCurrentProgram).Methods("GET")
     router.HandleFunc("/CurrentProgram", PutCurrentProgram).Methods("PUT")
-    fs := http.FileServer(http.Dir("./static/"))
-    router.Handle("/", fs)
+    fs := http.FileServer(http.Dir("static"))
+    router.PathPrefix("/").Handler(fs)
     log.Fatal(http.ListenAndServe("0.0.0.0:8000", logRequest(router)))
 }
 
