@@ -7,6 +7,7 @@ import (
         "net/http"
         "sync"
         "github.com/gorilla/mux"
+        "net/http/httputil"
 )
 
 type Program struct {
@@ -17,6 +18,16 @@ var mutex *sync.Mutex
 
 var currentProgram Program
 
+func logRequest(h http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        dump, err := httputil.DumpRequest(r, true)
+        if err != nil {
+            log.Printf("Failed to dump Request:%v\n", err)
+        }
+        log.Printf("Request:%v\n", string(dump))
+        h.ServeHTTP(w, r)
+    })
+}
 
 func main() {
     currentProgram.Number = 1
@@ -24,8 +35,9 @@ func main() {
     router := mux.NewRouter()
     router.HandleFunc("/CurrentProgram", GetCurrentProgram).Methods("GET")
     router.HandleFunc("/CurrentProgram", PutCurrentProgram).Methods("PUT")
-    router.Handle("/", http.FileServer(http.Dir("./static/")))
-    log.Fatal(http.ListenAndServe("192.168.0.110:8000", router))
+    fs := http.FileServer(http.Dir("./static/"))
+    router.Handle("/", fs)
+    log.Fatal(http.ListenAndServe("0.0.0.0:8000", logRequest(router)))
 }
 
 func GetCurrentProgram(w http.ResponseWriter, r *http.Request) {
