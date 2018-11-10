@@ -6,7 +6,7 @@
     <body>
         <h1>Fabulous Christmas Lights</h1>
         <p>Choose your own adventure</p>
-        <form action="/CurrentProgram" method="post">
+        <form action="/CurrentProgram" method="post" name="ProgramForm">
             <fieldset>
                 <legend> Select a Program:</legend>
                 <div>
@@ -19,9 +19,6 @@
                 </div>
             </fieldset>
         </form>
-        <div>
-            <p><button onclick="setProgram()">Submit</button></p>
-        </div>
     <script>
         function setProgram() {
             var button_value = document.querySelector('input[name="program"]:checked').value;
@@ -57,10 +54,14 @@
                     console.log(this.responseText);
                 }
             };
+
             request.open("GET", "/CurrentProgram", true);
             request.send();
         }
 
+        var form = document.getElementsByName("ProgramForm");
+        form[0].addEventListener('click', setProgram);
+        checkServerChange();
         setInterval(checkServerChange, 10000);
     </script>
     </body>
