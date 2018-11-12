@@ -37,7 +37,7 @@ func main() {
     router.HandleFunc("/CurrentProgram", PutCurrentProgram).Methods("PUT")
     fs := http.FileServer(http.Dir("static"))
     router.PathPrefix("/").Handler(fs)
-    log.Fatal(http.ListenAndServe("0.0.0.0:8000", logRequest(router)))
+    log.Fatal(http.ListenAndServeTLS("0.0.0.0:443", "server.crt", "server.key", logRequest(router)))
 }
 
 func GetCurrentProgram(w http.ResponseWriter, r *http.Request) {
