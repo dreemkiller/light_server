@@ -29,6 +29,17 @@ func logRequest(h http.Handler) http.Handler {
     })
 }
 
+func redirectTLS(w http.ResponseWriter, r *http.Request) {
+    http.Redirect(w, r, "https://0.0.0.0:443" + r.RequestURI, http.StatusMovedPermanently)
+}
+
+func httpFunc() {
+    if err := http.ListenAndServe("0.0.0.0:80", http.HandlerFunc(redirectTLS)); err != nil {
+        log.Fatalf("ListenAndServer error: %v\n", err)
+        return
+    }
+}
+
 func main() {
     currentProgram.Number = 1
     mutex = &sync.Mutex{}
@@ -37,6 +48,7 @@ func main() {
     router.HandleFunc("/CurrentProgram", PutCurrentProgram).Methods("PUT")
     fs := http.FileServer(http.Dir("static"))
     router.PathPrefix("/").Handler(fs)
+    go httpFunc()
     log.Fatal(http.ListenAndServeTLS("0.0.0.0:443", "server.crt", "server.key", logRequest(router)))
 }
 
