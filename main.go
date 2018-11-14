@@ -30,7 +30,9 @@ func logRequest(h http.Handler) http.Handler {
 }
 
 func redirectTLS(w http.ResponseWriter, r *http.Request) {
-    http.Redirect(w, r, "https://0.0.0.0:443" + r.RequestURI, http.StatusMovedPermanently)
+    target := "https://" + r.Host + r.URL.Path
+    log.Printf("Redirecting to %s\n", target)
+    http.Redirect(w, r, target, http.StatusMovedPermanently)
 }
 
 func httpFunc() {
